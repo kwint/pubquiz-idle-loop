@@ -304,8 +304,8 @@ let emojiCols, emojiRows;
 
 function buildEmojiGrid() {
   const diag = Math.sqrt(window.innerWidth ** 2 + window.innerHeight ** 2);
-  emojiCols = Math.ceil((diag * 2.5) / CELL_SIZE);
-  emojiRows = Math.ceil((diag * 2.5) / CELL_SIZE);
+  emojiCols = Math.ceil((diag * 1.5) / CELL_SIZE);
+  emojiRows = Math.ceil((diag * 1.5) / CELL_SIZE);
 
   // Track picks to avoid adjacent repeats (left and above)
   const grid = [];
@@ -568,6 +568,7 @@ function updateTitle(time) {
 //  MAIN LOOP
 // =============================================
 let lastTimestamp = 0;
+let lavaFrame = 0;
 
 function mainLoop(timestamp) {
   const time = timestamp / 1000; // seconds
@@ -577,7 +578,8 @@ function mainLoop(timestamp) {
   // Cap dt to avoid jumps on tab switch
   const safeDt = Math.min(dt, 0.1);
 
-  drawLava(time);
+  // Lava at 30fps — the 80px blur hides any difference
+  if (++lavaFrame % 2 === 0) drawLava(time);
   updateEmojiScroll(time, safeDt);
   maybeStartDance(time);
   updateTitle(time);
