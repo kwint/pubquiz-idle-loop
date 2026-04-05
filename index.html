@@ -329,20 +329,13 @@ let scrollY = 0;
 const SCROLL_SPEED = 10; // pixels per second
 
 function updateEmojiScroll(time, dt) {
-  // Scroll direction slowly evolves
-  const baseAngle = -0.45; // ~-25 degrees
-  const angleWander = sn(time * 0.015, 1234) * 0.5 + sn(time * 0.03, 5678) * 0.3;
-  const angle = baseAngle + angleWander;
+  // Move in a large slow circle — never drifts off-screen
+  const RADIUS = 150; // pixels
+  const PERIOD = 120; // seconds for a full loop
+  const angle = time * (2 * Math.PI / PERIOD);
 
-  // Speed varies gently
-  const speedMul = 0.7 + sn(time * 0.02, 3333) * 0.3;
-
-  scrollX += Math.cos(angle) * SCROLL_SPEED * speedMul * dt;
-  scrollY += Math.sin(angle) * SCROLL_SPEED * speedMul * dt;
-
-  // Gentle centering — prevents grid from ever drifting off-screen
-  scrollX *= (1 - 0.0003 * dt);
-  scrollY *= (1 - 0.0003 * dt);
+  scrollX = Math.cos(angle) * RADIUS;
+  scrollY = Math.sin(angle) * RADIUS;
 
   // Position grid centered on viewport
   const gridW = emojiCols * CELL_SIZE;
@@ -350,7 +343,7 @@ function updateEmojiScroll(time, dt) {
   const cx = window.innerWidth / 2 - gridW / 2 + scrollX;
   const cy = window.innerHeight / 2 - gridH / 2 + scrollY;
 
-  const rotation = baseAngle + angleWander * 0.3; // rotate more gently than direction changes
+  const rotation = -0.45 + sn(time * 0.015, 1234) * 0.15;
   emojiGridEl.style.transform =
     `translate(${cx.toFixed(1)}px, ${cy.toFixed(1)}px) rotate(${rotation.toFixed(4)}rad)`;
 }
