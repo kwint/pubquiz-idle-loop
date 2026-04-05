@@ -156,7 +156,7 @@ body {
 <div class="title-layer">
   <div class="title-sub" id="titleLine1">De Mohicanen</div>
   <div class="title-sub" id="titleLine2">Pubquiz 2026</div>
-  <div class="title-main" id="titleLine3">GOED!</div>
+  <div class="title-main" id="titleLine3">GOED</div>
 </div>
 
 <script>
@@ -307,10 +307,20 @@ function buildEmojiGrid() {
   emojiCols = Math.ceil((diag * 2.5) / CELL_SIZE);
   emojiRows = Math.ceil((diag * 2.5) / CELL_SIZE);
 
+  // Track picks to avoid adjacent repeats (left and above)
+  const grid = [];
   let html = '';
   for (let r = 0; r < emojiRows; r++) {
+    grid[r] = [];
     for (let c = 0; c < emojiCols; c++) {
-      const idx = ((r * 8) + (c * 3)) % EMOJIS.length;
+      const avoid = new Set();
+      if (c > 0) avoid.add(grid[r][c - 1]);
+      if (r > 0) avoid.add(grid[r - 1][c]);
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * EMOJIS.length);
+      } while (avoid.has(idx) && avoid.size < EMOJIS.length - 1);
+      grid[r][c] = idx;
       html += `<span data-r="${r}" data-c="${c}">${EMOJIS[idx]}</span>`;
     }
     html += '<br>';
